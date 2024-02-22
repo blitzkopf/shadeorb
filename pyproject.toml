@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "shadeorb"
+version = "0.0.0"
+description = ""
+authors = ["Yngvi Thor Sigurjonsson <blitzkopf@gmail.com>"]
+readme = "README.md"
+packages = [ { include = "shadeorb" }]
+
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.13"
+bleak = "^0.21.1"
+bleak-retry-connector = "^3.4.0"
+bitstruct = "^8.19.0"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.0.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
