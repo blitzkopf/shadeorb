@@ -178,7 +178,7 @@ class ORB:
         command = self._protocol.construct_levels_change(
             *whites,
             *self._state.outer_warm_cold,
-            self._state.edge_rgbw[3]
+            self._state.edge_rgbw[3],
             *self._state.edge_rgbw[0:3],
         )
         print('Command:',command.hex())
@@ -206,7 +206,7 @@ class ORB:
         command = self._protocol.construct_levels_change(
             *self._state.inner_warm_cold,
             *whites,
-            self._state.edge_rgbw[3]
+            self._state.edge_rgbw[3],
             *self._state.edge_rgbw[0:3],
         )
         print('Command:',command.hex())

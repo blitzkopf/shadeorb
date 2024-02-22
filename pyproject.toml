@@ -1,9 +1,17 @@
 [tool.poetry]
 name = "shadeorb"
-version = "0.0.0"
-description = ""
+version = "0.0.1"
+description = "Package to control Shade ORB lights"
 authors = ["Yngvi Thor Sigurjonsson <blitzkopf@gmail.com>"]
 readme = "README.md"
+license = "MIT"
+homepage = "https://github.com/blitzkopf/shadeorb"
+repository = "https://github.com/blitzkopf/shadeorb"
+keywords = ["shadeorb", "lights", "bleak", "bluetooth", "homeassistant"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Topic :: Home Automation"
+    ]
 packages = [ { include = "shadeorb" }]
 
 
