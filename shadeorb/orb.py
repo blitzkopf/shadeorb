@@ -37,9 +37,11 @@ DEFAULT_ATTEMPTS = 3
 class ORB:
     def __init__(
         self, ble_device: BLEDevice,
+        cmd_prefix: str,
         advertisement_data: AdvertisementData | None = None
     ) -> None:
         self._ble_device = ble_device
+        self._cmd_prefix = bytes.fromhex(cmd_prefix.translate({ord(i): None for i in ' -:'}))
         self._advertisement_data = advertisement_data
         self._operation_lock = asyncio.Lock()
         self._state = ORBState()
@@ -123,7 +125,7 @@ class ORB:
         """Turn on."""
         _LOGGER.debug("%s: Turn on", self.name)
         assert self._protocol is not None  # nosec
-        await self._send_command(self._protocol.construct_state_change(True))
+        await self._send_command(self._protocol.construct_state_change(self._cmd_prefix,True))
         self._state = replace(self._state, power=True)
         self._fire_callbacks()
 
@@ -131,7 +133,7 @@ class ORB:
         """Turn off."""
         _LOGGER.debug("%s: Turn off", self.name)
         assert self._protocol is not None  # nosec
-        await self._send_command(self._protocol.construct_state_change(False))
+        await self._send_command(self._protocol.construct_state_change(self._cmd_prefix,False))
         self._state = replace(self._state, power=False)
         self._fire_callbacks()
 
@@ -149,6 +151,7 @@ class ORB:
         assert self._protocol is not None  # nosec
 
         command = self._protocol.construct_levels_change(
+            self._cmd_prefix,
             *self._state.inner_warm_cold,
             *self._state.outer_warm_cold,
             rgbw[3], *rgbw[0:3], 
@@ -176,6 +179,7 @@ class ORB:
         assert self._protocol is not None  # nosec
 
         command = self._protocol.construct_levels_change(
+            self._cmd_prefix,
             *whites,
             *self._state.outer_warm_cold,
             self._state.edge_rgbw[3],
@@ -204,6 +208,7 @@ class ORB:
         assert self._protocol is not None  # nosec
 
         command = self._protocol.construct_levels_change(
+            self._cmd_prefix,
             *self._state.inner_warm_cold,
             *whites,
             self._state.edge_rgbw[3],
@@ -222,7 +227,7 @@ class ORB:
         """Set an effect."""
         _LOGGER.debug("%s: Set effect: %s brightness: %s", self.name, effect, brightness)
         assert self._protocol is not None
-        command = self._protocol.construct_effect_start(3)
+        command = self._protocol.construct_effect_start(self._cmd_prefix,int(effect))
         await self._send_command(command)
         self._fire_callbacks()
 

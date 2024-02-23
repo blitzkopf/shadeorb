@@ -18,14 +18,15 @@ class ORBProtocol:
         """The off byte."""
         return 0x00
 
-    def construct_state_change(self, turn_on: int) -> bytearray:
+    def construct_state_change(self,cmd_prefix: bytes, turn_on: int) -> bytearray:
         """The bytes to send for a state change request."""
         return self.construct_message(
-            bytearray([0xBB, 0x0F, 0x69, 0x52, 0x00, 0x41, 0x06, self.on_byte if turn_on else self.off_byte])
+            bytearray(cmd_prefix) + bytearray([ 0x00, 0x41, 0x06, self.on_byte if turn_on else self.off_byte])
         )
 
     def construct_levels_change(
         self,
+        cmd_prefix: bytes,
         inner_warm_white: int,
         inner_cool_white: int,
         outer_warm_white: int,
@@ -45,22 +46,25 @@ class ORBProtocol:
         edge_bytes=bitpack('u12u12u12u12',edge_white,edge_red,edge_green,edge_blue)
         print('edge_bytes:',edge_bytes.hex())
         return self.construct_message(
-            bytearray(
+            bytearray(cmd_prefix) 
+            + bytearray(
                 [
-                    0xBB, 0x0F, 0x69, 0x52, 0x00, 0x41, 0x11, 0xFF,
+                    0x00, 0x41, 0x11, 0xFF,
                 ]
             )+inner_bytes+outer_bytes+edge_bytes
         )
     
     def construct_effect_start(
         self,
+        cmd_prefix: bytes,
         effect: int,
     ) -> List[bytearray]:
         """The bytes to send for a level change request."""
         return self.construct_message(
-            bytearray(
+            bytearray(cmd_prefix) 
+            + bytearray(
                 [
-                    0xBB, 0x0F, 0x69, 0x52, 0xC0, 0x01, 0x01, 
+                     0xC0, 0x01, 0x01, 
                 ]
             )+pack('B',effect)
         )

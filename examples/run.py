@@ -96,43 +96,43 @@ async def run() -> None:
         _LOGGER.info("State changed: %s", state)
 
     device = await future
-    orb = ORB(device)
+    orb = ORB(device,'83-b0-91-73')
     await orb._ensure_connected()
-    await list_readable_characteristics(orb._client)
-    cancel_callback = orb.register_callback(on_state_changed)
+    #await list_readable_characteristics(orb._client)
+    #cancel_callback = orb.register_callback(on_state_changed)
     await orb.update()
-    await read_readable_characteristics(orb._client)
+    #await read_readable_characteristics(orb._client)
     
     await orb.turn_on()
-    await read_readable_characteristics(orb._client)
+    #await read_readable_characteristics(orb._client)
     await asyncio.sleep(2)
     
     await orb.set_edge_rgbw((4095, 0, 0, 0), 4095)
-    await read_readable_characteristics(orb._client)
+    #await read_readable_characteristics(orb._client)
     await asyncio.sleep(2)
     
     await orb.set_edge_rgbw((0, 4095, 0, 1024), 2047)
-    await read_readable_characteristics(orb._client)
+    #await read_readable_characteristics(orb._client)
     await asyncio.sleep(2)
     
     await orb.set_edge_rgbw((0, 0, 4095, 2048), 4095)
-    await read_readable_characteristics(orb._client)
+    #await read_readable_characteristics(orb._client)
     await asyncio.sleep(2)
     
-    # await orb.set_edge_rgbw((4095, 4095, 4095, 2048), 4095)
+    await orb.set_edge_rgbw((4095, 4095, 4095, 2048), 4095)
     # await read_readable_characteristics(orb._client)
-    # await asyncio.sleep(2)
+    await asyncio.sleep(2)
     
-    # await orb.set_edge_rgbw((0, 0, 0, 0), 4095)
-    # await orb.set_l0_whites((4095, 0))
-    # await asyncio.sleep(2)
-    # await orb.set_l0_whites((0,4095))
+    await orb.set_edge_rgbw((0, 0, 0, 0), 4095)
+    await orb.set_inner_whites((4095, 0))
+    await asyncio.sleep(2)
+    await orb.set_inner_whites((0,4095))
 
-    # await asyncio.sleep(5)
-    # await orb.turn_off()
+    await asyncio.sleep(5)
+    await orb.turn_off()
     # await read_readable_characteristics(orb._client)
     # # await led.update()
-    cancel_callback()
+    #cancel_callback()
     await scanner.stop()
 
 
