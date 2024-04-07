@@ -423,6 +423,7 @@ class ORB:
     ) -> None:
         """Send command to device and read response."""
         await self._ensure_connected()
+        print('sending to :',self._client.address)
         #await self._resolve_protocol()
         if not isinstance(commands, list):
             commands = [commands]

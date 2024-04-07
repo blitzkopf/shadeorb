@@ -9,8 +9,9 @@ from shadeorb import ORB,ORBState
 
 _LOGGER = logging.getLogger(__name__)
 
-ADDRESS = "C0:4E:63:AD:78:E3"
-#ADDRESS = "F4:E0:9F:B8:16:D3"
+#ADDRESS = "C0:4E:63:AD:78:E3"
+ADDRESS = "F4:E0:9F:B8:16:D3"
+PREFIX  = "53:e5:db:37"
 SERVICE_UUID = "00001523-3d1c-019e-ab4a-65fd86e87333"
 SERVICE_UUID = "00001522-3d1c-019e-ac4a-65fd86E87333"
 SERVICE_UUID = "00001801-0000-1000-8000-00805f9b34fb"
@@ -96,7 +97,7 @@ async def run() -> None:
         _LOGGER.info("State changed: %s", state)
 
     device = await future
-    orb = ORB(device,'83-b0-91-73')
+    orb = ORB(device,PREFIX)
     await orb._ensure_connected()
     #await list_readable_characteristics(orb._client)
     #cancel_callback = orb.register_callback(on_state_changed)
@@ -137,5 +138,5 @@ async def run() -> None:
 
 
 logging.basicConfig(level=logging.INFO)
-logging.getLogger("led_ble").setLevel(logging.DEBUG)
+logging.getLogger("shadeorb").setLevel(logging.DEBUG)
 asyncio.run(run())

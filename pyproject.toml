@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "shadeorb"
-version = "0.0.1"
+version = "0.0.2"
 description = "Package to control Shade ORB lights"
 authors = ["Yngvi Thor Sigurjonsson <blitzkopf@gmail.com>"]
 readme = "README.md"
