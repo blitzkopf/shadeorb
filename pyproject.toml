@@ -20,6 +20,7 @@ python = ">=3.10,<3.13"
 bleak = "^0.21.1"
 bleak-retry-connector = "^3.4.0"
 bitstruct = "^8.19.0"
+ruff = "^0.3.5"
 
 
 [tool.poetry.group.test.dependencies]

@@ -3,7 +3,6 @@ import logging
 
 from collections.abc import Callable
 from dataclasses import replace
-from typing import Any, TypeVar
 
 from bleak.backends.device import BLEDevice
 from bleak.backends.scanner import AdvertisementData
@@ -36,12 +35,15 @@ DEFAULT_ATTEMPTS = 3
 
 class ORB:
     def __init__(
-        self, ble_device: BLEDevice,
+        self,
+        ble_device: BLEDevice,
         cmd_prefix: str,
-        advertisement_data: AdvertisementData | None = None
+        advertisement_data: AdvertisementData | None = None,
     ) -> None:
         self._ble_device = ble_device
-        self._cmd_prefix = bytes.fromhex(cmd_prefix.translate({ord(i): None for i in ' -:'}))
+        self._cmd_prefix = bytes.fromhex(
+            cmd_prefix.translate({ord(i): None for i in " -:"})
+        )
         self._advertisement_data = advertisement_data
         self._operation_lock = asyncio.Lock()
         self._state = ORBState()
@@ -53,11 +55,12 @@ class ORB:
         self._expected_disconnect = False
         self.loop = asyncio.get_running_loop()
         self._callbacks: list[Callable[[ORBState], None]] = []
-        #self._model_data: ORBModel | None = None
-        #self._protocol: PROTOCOL_TYPES | None = None
-        self._protocol= ORBProtocol()
+        # self._model_data: ORBModel | None = None
+        # self._protocol: PROTOCOL_TYPES | None = None
+        self._protocol = ORBProtocol()
 
         self._resolve_protocol_event = asyncio.Event()
+
     def set_ble_device_and_advertisement_data(
         self, ble_device: BLEDevice, advertisement_data: AdvertisementData
     ) -> None:
@@ -106,26 +109,27 @@ class ORB:
     @property
     def effect_list(self):
         """Return the list of supported effects."""
-        return ['0','1','2','3','4','5','6','7']
+        return ["0", "1", "2", "3", "4", "5", "6", "7"]
 
     async def update(self) -> None:
         """Update the Orb."""
         await self._ensure_connected()
-        #await self._resolve_protocol()
+        # await self._resolve_protocol()
         _LOGGER.debug("%s: Updating", self.name)
         assert self._protocol is not None  # nosec
         # I have no idea how to get the state of the orb
-        #command = self._protocol.construct_state_query()
-        #await self._send_command([command])
+        # command = self._protocol.construct_state_query()
+        # await self._send_command([command])
         ## YS: this really should not be here
         self._fire_callbacks()
-
 
     async def turn_on(self) -> None:
         """Turn on."""
         _LOGGER.debug("%s: Turn on", self.name)
         assert self._protocol is not None  # nosec
-        await self._send_command(self._protocol.construct_state_change(self._cmd_prefix,True))
+        await self._send_command(
+            self._protocol.construct_state_change(self._cmd_prefix, True)
+        )
         self._state = replace(self._state, power=True)
         self._fire_callbacks()
 
@@ -133,12 +137,14 @@ class ORB:
         """Turn off."""
         _LOGGER.debug("%s: Turn off", self.name)
         assert self._protocol is not None  # nosec
-        await self._send_command(self._protocol.construct_state_change(self._cmd_prefix,False))
+        await self._send_command(
+            self._protocol.construct_state_change(self._cmd_prefix, False)
+        )
         self._state = replace(self._state, power=False)
         self._fire_callbacks()
 
     async def set_edge_rgbw(
-        self, rgbw: tuple[int, int, int,int], brightness: int | None = None
+        self, rgbw: tuple[int, int, int, int], brightness: int | None = None
     ) -> None:
         """Set rgb."""
         _LOGGER.debug("%s: Set rgb: %s brightness: %s", self.name, rgbw, brightness)
@@ -154,14 +160,15 @@ class ORB:
             self._cmd_prefix,
             *self._state.inner_warm_cold,
             *self._state.outer_warm_cold,
-            rgbw[3], *rgbw[0:3], 
+            rgbw[3],
+            *rgbw[0:3],
         )
-        print('Command:',command.hex())
+        print("Command:", command.hex())
         await self._send_command(command)
         self._state = replace(
             self._state,
             edge_rgbw=rgbw,
-            #preset_pattern=1 if self.dream else self.preset_pattern_num,
+            # preset_pattern=1 if self.dream else self.preset_pattern_num,
         )
         self._fire_callbacks()
 
@@ -169,7 +176,9 @@ class ORB:
         self, whites: tuple[int, int], brightness: int | None = None
     ) -> None:
         """Set rgb."""
-        _LOGGER.debug("%s: Set light 0 whites: %s brightness: %s", self.name, whites, brightness)
+        _LOGGER.debug(
+            "%s: Set light 0 whites: %s brightness: %s", self.name, whites, brightness
+        )
         for value in whites:
             if not 0 <= value <= 4095:
                 raise ValueError("Value {} is outside the valid range of 0-4095")
@@ -185,12 +194,12 @@ class ORB:
             self._state.edge_rgbw[3],
             *self._state.edge_rgbw[0:3],
         )
-        print('Command:',command.hex())
+        print("Command:", command.hex())
         await self._send_command(command)
         self._state = replace(
             self._state,
             inner_warm_cold=whites,
-            #preset_pattern=1 if self.dream else self.preset_pattern_num,
+            # preset_pattern=1 if self.dream else self.preset_pattern_num,
         )
         self._fire_callbacks()
 
@@ -198,7 +207,9 @@ class ORB:
         self, whites: tuple[int, int], brightness: int | None = None
     ) -> None:
         """Set rgb."""
-        _LOGGER.debug("%s: Set light 0 whites: %s brightness: %s", self.name, whites, brightness)
+        _LOGGER.debug(
+            "%s: Set light 0 whites: %s brightness: %s", self.name, whites, brightness
+        )
         for value in whites:
             if not 0 <= value <= 4095:
                 raise ValueError("Value {} is outside the valid range of 0-4095")
@@ -214,23 +225,24 @@ class ORB:
             self._state.edge_rgbw[3],
             *self._state.edge_rgbw[0:3],
         )
-        print('Command:',command.hex())
+        print("Command:", command.hex())
         await self._send_command(command)
         self._state = replace(
             self._state,
             outer_warm_cold=whites,
-            #preset_pattern=1 if self.dream else self.preset_pattern_num,
+            # preset_pattern=1 if self.dream else self.preset_pattern_num,
         )
         self._fire_callbacks()
 
     async def set_effect(self, effect: str, brightness: int) -> None:
         """Set an effect."""
-        _LOGGER.debug("%s: Set effect: %s brightness: %s", self.name, effect, brightness)
+        _LOGGER.debug(
+            "%s: Set effect: %s brightness: %s", self.name, effect, brightness
+        )
         assert self._protocol is not None
-        command = self._protocol.construct_effect_start(self._cmd_prefix,int(effect))
+        command = self._protocol.construct_effect_start(self._cmd_prefix, int(effect))
         await self._send_command(command)
         self._fire_callbacks()
-
 
     async def stop(self) -> None:
         """Stop the ORB."""
@@ -320,6 +332,7 @@ class ORB:
             self.name,
             self.rssi,
         )
+
     def _disconnect(self) -> None:
         """Disconnect from device."""
         self._disconnect_timer = None
@@ -352,6 +365,7 @@ class ORB:
                             "%s: Failed to stop notifications", self.name, exc_info=True
                         )
                 await client.disconnect()
+
     async def _ensure_connected(self) -> None:
         """Ensure connection to device is established."""
         if self._connect_lock.locked():
@@ -423,8 +437,8 @@ class ORB:
     ) -> None:
         """Send command to device and read response."""
         await self._ensure_connected()
-        print('sending to :',self._client.address)
-        #await self._resolve_protocol()
+        print("sending to :", self._client.address)
+        # await self._resolve_protocol()
         if not isinstance(commands, list):
             commands = [commands]
         await self._send_command_while_connected(commands, retry)

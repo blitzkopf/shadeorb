@@ -7,8 +7,8 @@ from dataclasses import dataclass
 class ORBState:
 
     power: bool = False
-    inner_warm_cold: tuple[int,int] = (0,0)
-    outer_warm_cold: tuple[int,int] = (0,0)
+    inner_warm_cold: tuple[int, int] = (0, 0)
+    outer_warm_cold: tuple[int, int] = (0, 0)
     edge_rgbw: tuple[int, int, int, int] = (0, 0, 0, 0)
 
     # model_num: int = 0
