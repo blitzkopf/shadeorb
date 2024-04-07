@@ -1,5 +1,6 @@
 import pytest
-from  shadeorb.protocol import ORBProtocol
+from shadeorb.protocol import ORBProtocol
+
 
 @pytest.fixture
 def protocol():
